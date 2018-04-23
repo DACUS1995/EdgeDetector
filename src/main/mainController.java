@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -37,11 +38,18 @@ public class mainController implements Initializable
     @FXML
     private ProgressBar loadRawImageProgressbar;
 
+    @FXML
+    private Button transformImageButton;
 
+    @FXML
+    private TextArea contextualEventsTextArea;
+
+    // TODO use specific image formats to make a slect bar or something (exe: select png, fpg, bmp, etc.)
     // Normal non FXML members
     private String selectedImagePath = null;
     private File selctedImageFile = null;
     private Image selectedImage = null;
+
     private Image processedImage = null;
 
     @Override
@@ -62,37 +70,49 @@ public class mainController implements Initializable
 
         File selectedFile = fileChooser.showOpenDialog(dialogFileChooser);
 
-        if(selectedFile == null)
-        {
-            this.textImagePath.setText("No image selected");
-        }
-        else
-        {
-            this.selectedImagePath = selectedFile.getAbsolutePath();
-            this.textImagePath.setText(this.selectedImagePath);
-        }
+        this.selectedImagePath = selectedFile.getAbsolutePath();
+        this.textImagePath.setText(this.selectedImagePath);
 
     }
 
     public void loadImageToDisplay()
     {
-        this.selectedImage = new Image(this.buildLoadingPath(this.selectedImagePath), 800, 600, true, true, true);
+        if(this.selectedImagePath == null)
+        {
+            this.contextualEventsTextArea.setText("An image must be selected first");
+            this.contextualEventsTextArea.setStyle("-fx-fill: red; -fx-font: 16px \"Serif\"");
+        }
+        else
+        {
+            this.selectedImage = new Image(this.buildLoadingPath(this.selectedImagePath), 800, 600, true, true, true);
 
-        this.log("Before thread");
-        // Spawn a new thread to update the progress bar based on the percentage of image loaded
-        this.updateTask(this.loadRawImageProgressbar, () -> this.selectedImage.getProgress());
-        this.log("After thread");
+            this.log("Before thread");
+            // Spawn a new thread to update the progress bar based on the percentage of image loaded
+            this.updateTask(this.loadRawImageProgressbar, () -> this.selectedImage.getProgress());
+            this.log("After thread");
 
-        this.imageDisplayView.setImage(this.selectedImage);
+            this.imageDisplayView.setImage(this.selectedImage);
+        }
+
+    }
+
+    public void transformImageDarker()
+    {
+        if(this.selectedImage == null)
+        {
+            this.contextualEventsTextArea.setText("An image must be selected first");
+            this.contextualEventsTextArea.setStyle("-fx-fill: red; -fx-font: 16px \"Serif\"");
+        }
+        else
+        {
+            this.log("::Transforming Image -> Darker");
+            ImageFilter imageFilter = new ImageFilter(this.selectedImage, this.imageDisplayView);
+            imageFilter.transformDarker();
+        }
     }
 
     private String buildLoadingPath(String strImagePath)
     {
-        // TODO use a fixed path to test why it doesn't work
-        // Look at the image class in https://docs.oracle.com/javase/8/javafx/api/javafx/scene/image/Image.html
-        // You can edit the image bit map
-        // Also get the progress of the loading
-
         this.selctedImageFile = new File(strImagePath);
         String parsedPath = this.selctedImageFile.toURI().toString();
 
@@ -120,7 +140,7 @@ public class mainController implements Initializable
                 }
             }
 
-            mainController.this.log("Progress Completed");
+            mainController.this.log("::Loading image Completed");
         });
 
         thread.setDaemon(true);
