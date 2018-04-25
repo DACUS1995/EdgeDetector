@@ -29,6 +29,29 @@ public class ImageFilter {
         this.height = this.originalImage.getHeight();
     }
 
+    public void transformEdgeDetection()
+    {
+        // TODO Implement filter
+        WritableImage wImage = new WritableImage((int)this.width, (int)this.height);
+
+        PixelReader pixelReader = this.originalImage.getPixelReader();
+        PixelWriter pixelWriter = wImage.getPixelWriter();
+
+        //Reading the color of the image
+        for(int y = 0; y < height; y++) {
+            for(int x = 0; x < width; x++) {
+                //Retrieving the color of the pixel of the loaded image
+                Color color = pixelReader.getColor(x, y);
+
+                //Setting the color to the writable image
+                pixelWriter.setColor(x, y, color.darker());
+            }
+        }
+
+        //Setting the view for the writable image
+        this.imageDisplayView.setImage(wImage);
+    }
+
     public void transformDarker()
     {
         WritableImage wImage = new WritableImage((int)this.width, (int)this.height);

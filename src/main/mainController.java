@@ -1,20 +1,18 @@
 package main;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -39,10 +37,10 @@ public class mainController implements Initializable
     private ProgressBar loadRawImageProgressbar;
 
     @FXML
-    private Button transformImageButton;
+    private TextArea contextualEventsTextArea;
 
     @FXML
-    private TextArea contextualEventsTextArea;
+    private ChoiceBox ImageTypeSelector;
 
     // TODO use specific image formats to make a slect bar or something (exe: select png, fpg, bmp, etc.)
     // Normal non FXML members
@@ -52,10 +50,17 @@ public class mainController implements Initializable
 
     private Image processedImage = null;
 
+    private static String[] availableTypes = {"jpg",  "bmp", "png"};
+
     @Override
     public void initialize(URL location, ResourceBundle resources)
     {
+        // Populate the ImageTypeSelector woth elements
+        this.ImageTypeSelector.setItems(FXCollections.observableArrayList(
+                "All", "*.jpg", "*.bmp", "*.png"
+                ));
 
+        this.ImageTypeSelector.getSelectionModel().select(0);
     }
 
     public void selectImage()
@@ -70,9 +75,23 @@ public class mainController implements Initializable
 
         File selectedFile = fileChooser.showOpenDialog(dialogFileChooser);
 
-        this.selectedImagePath = selectedFile.getAbsolutePath();
-        this.textImagePath.setText(this.selectedImagePath);
+        if(this.checkTypeSelected(selectedFile))
+        {
+            this.selectedImagePath = selectedFile.getAbsolutePath();
+            this.textImagePath.setText(this.selectedImagePath);
+        }
+        else
+        {
+            this.log("The file and the extemsion do not match");
+        }
 
+
+    }
+
+    private boolean checkTypeSelected(File selectedFile)
+    {
+        String extension = selectedFile.getName().split("\\.")[1];
+        return extension.equals(this.ImageTypeSelector.getSelectionModel().getSelectedItem().toString().substring(2));
     }
 
     public void loadImageToDisplay()
@@ -108,6 +127,21 @@ public class mainController implements Initializable
             this.log("::Transforming Image -> Darker");
             ImageFilter imageFilter = new ImageFilter(this.selectedImage, this.imageDisplayView);
             imageFilter.transformDarker();
+        }
+    }
+
+    public void transformImageEdgeDetection()
+    {
+        if (this.selectedImage == null)
+        {
+            this.contextualEventsTextArea.setText("An image must be selected first");
+            this.contextualEventsTextArea.setStyle("-fx-fill: red; -fx-font: 16px \"Serif\"");
+        }
+        else
+        {
+            this.log("::Transforming Image -> Edge Detection");
+            ImageFilter imageFilter = new ImageFilter(this.selectedImage, this.imageDisplayView);
+            imageFilter.transformEdgeDetection();
         }
     }
 
@@ -175,6 +209,8 @@ public class mainController implements Initializable
 
     private void log(String output)
     {
+        this.contextualEventsTextArea.setStyle("-fx-fill: red; -fx-font: 16px \"Serif\"");
+        this.contextualEventsTextArea.setText(output);
         System.out.println(output);
     }
 }
