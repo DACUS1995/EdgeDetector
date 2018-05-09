@@ -138,14 +138,21 @@ public class mainController implements Initializable
 
         File selectedFile = fileChooser.showOpenDialog(dialogFileChooser);
 
-        if(this.checkTypeSelected(selectedFile))
+        if(selectedFile != null)
         {
-            this.selectedImagePath = selectedFile.getAbsolutePath();
-            this.textImagePath.setText(this.selectedImagePath);
+            if(this.checkTypeSelected(selectedFile))
+            {
+                this.selectedImagePath = selectedFile.getAbsolutePath();
+                this.textImagePath.setText(this.selectedImagePath);
+            }
+            else
+            {
+                this.log("The file and the extemsion do not match");
+            }
         }
         else
         {
-            this.log("The file and the extemsion do not match");
+            this.log("::Pressed Cancel => no image selected!");
         }
     }
 
