@@ -28,47 +28,50 @@ import java.util.ResourceBundle;
 
 
 
-public class mainController implements Initializable
+public class mainController
 {
 
     @FXML
-    private Button buttonSelectImage;
+    private Button buttonSelectImage = (Button) SceneBuilder.graphicContainer.get("buttonSelectImage");
 
     @FXML
-    private Button buttonLoadImage;
+    private Button buttonLoadImage = (Button) SceneBuilder.graphicContainer.get("buttonLoadImage");
 
     @FXML
-    private TextField textImagePath;
+    private TextField textImagePath = (TextField) SceneBuilder.graphicContainer.get("textImagePath");
 
     @FXML
-    private ImageView imageDisplayView;
+    private Button buttonTransformImage = (Button) SceneBuilder.graphicContainer.get("buttonTransformImage");;
 
     @FXML
-    private ProgressBar loadRawImageProgressbar;
+    private ImageView imageDisplayView = (ImageView) SceneBuilder.graphicContainer.get("imageDisplayView");
 
     @FXML
-    private TextArea contextualEventsTextArea;
+    private ProgressBar loadRawImageProgressbar = (ProgressBar) SceneBuilder.graphicContainer.get("loadRawImageProgressbar");
 
     @FXML
-    private ChoiceBox ImageTypeSelector;
+    private TextArea contextualEventsTextArea = (TextArea) SceneBuilder.graphicContainer.get("contextualEventsTextArea");
 
     @FXML
-    private RadioButton buttonSelectDarker;
+    private ChoiceBox ImageTypeSelector = (ChoiceBox) SceneBuilder.graphicContainer.get("ImageTypeSelector");
 
     @FXML
-    private RadioButton buttonSelectEdgeDetection;
+    private RadioButton buttonSelectDarker = (RadioButton) SceneBuilder.graphicContainer.get("buttonSelectDarker");
 
     @FXML
-    private Button buttonSaveFile;
+    private RadioButton buttonSelectEdgeDetection = (RadioButton) SceneBuilder.graphicContainer.get("buttonSelectEdgeDetection");
 
     @FXML
-    private Label labelProgress;
+    private Button buttonSaveFile = (Button) SceneBuilder.graphicContainer.get("buttonSaveFile");
 
     @FXML
-    private TextField textfieldImageSaveName;
+    private Label labelProgress = (Label) SceneBuilder.graphicContainer.get("labelProgress");
 
     @FXML
-    private Hyperlink linkSobelInfo;
+    private TextField textfieldImageSaveName = (TextField) SceneBuilder.graphicContainer.get("textfieldImageSaveName");
+
+    @FXML
+    private Hyperlink linkSobelInfo = (Hyperlink) SceneBuilder.graphicContainer.get("linkSobelInfo");
 
     // Normal non FXML members
     private String selectedImagePath = null;
@@ -80,8 +83,7 @@ public class mainController implements Initializable
 
     private static String[] availableTypes = {"jpg",  "bmp", "png"};
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources)
+    public void initialize()
     {
         // Populate the ImageTypeSelector woth elements
         this.ImageTypeSelector.setItems(FXCollections.observableArrayList(
@@ -121,6 +123,19 @@ public class mainController implements Initializable
         {
             this.log("::URI syntax problem");
         }
+
+        // ::::::::::LOAD BUTTONS EVENTS HANDLERS::::::::::::
+        this.buttonSelectImage.setOnAction((event)->this.selectImage());
+
+        this.buttonLoadImage.setOnAction((event)->this.loadImageToDisplay());
+
+        this.buttonSaveFile.setOnAction((event)->this.saveNewImage());
+
+        this.buttonSelectDarker.setOnAction((event)->this.selectTransTypeDarker());
+
+        this.buttonSelectEdgeDetection.setOnAction((event)->this.selectTransTypeEdge());
+
+        this.buttonTransformImage.setOnAction((event)->this.transformImage());
     }
 
     /**
@@ -147,7 +162,7 @@ public class mainController implements Initializable
             }
             else
             {
-                this.log("The file and the extemsion do not match");
+                this.log("The file and the extension do not match");
             }
         }
         else
