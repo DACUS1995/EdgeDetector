@@ -1,5 +1,7 @@
 package main;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -16,7 +18,7 @@ public class SceneBuilder {
     public static Hashtable<String, Node> graphicContainer =
             new Hashtable<String, Node>();
 
-    public static Button buttonSelectImage = null;
+    public static ObservableList globalEventArray = null;
 
     public SceneBuilder()
     {
@@ -105,6 +107,16 @@ public class SceneBuilder {
         gridPane.add(contextualEventsTextArea, 0,6, 2,1);
         graphicContainer.put("contextualEventsTextArea", contextualEventsTextArea);
 
+        ListView<String> eventList = new ListView<String>();
+        ObservableList eventArray = FXCollections.observableArrayList();
+        eventList.setItems(eventArray);
+        eventList.setPrefHeight(100);
+        gridPane.add(eventList, 0,7,2,1);
+        globalEventArray = eventArray;
+
+        ProgressIndicator eventsProgressIndicator = new ProgressIndicator(0.0);
+        gridPane.add(eventsProgressIndicator,2,6);
+        graphicContainer.put("eventsProgressIndicator", eventsProgressIndicator);
 
         //:::::::::Image Section::::::::::
         ImageView imageDisplayView = new ImageView();

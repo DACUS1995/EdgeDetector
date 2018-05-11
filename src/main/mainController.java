@@ -2,6 +2,7 @@ package main;
 
 import javafx.application.HostServices;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -73,6 +74,8 @@ public class mainController
     @FXML
     private Hyperlink linkSobelInfo = (Hyperlink) SceneBuilder.graphicContainer.get("linkSobelInfo");
 
+    private ProgressIndicator eventsProgressIndicator = (ProgressIndicator) SceneBuilder.graphicContainer.get("eventsProgressIndicator");
+
     // Normal non FXML members
     private String selectedImagePath = null;
     private File selctedImageFile = null;
@@ -107,6 +110,7 @@ public class mainController
         try
         {
             URI url = new URI("https://en.wikipedia.org/wiki/Sobel_operator");
+            this.linkSobelInfo.setText("More information about Sobel operator");
             this.linkSobelInfo.setOnMouseClicked((event)->{
                 try
                 {
@@ -115,7 +119,7 @@ public class mainController
                 }
                 catch (IOException e)
                 {
-                    // DO something
+                    e.printStackTrace();
                 }
             });
         }
@@ -362,7 +366,21 @@ public class mainController
     {
         this.contextualEventsTextArea.setStyle("-fx-fill: red; -fx-font: 16px \"Serif\"");
         this.contextualEventsTextArea.setText(output);
+
+        ObservableList eventArray = SceneBuilder.globalEventArray;
+        eventArray.add(output);
+
+        this.incrementEventsProgress();
+
         System.out.println(output);
+    }
+
+    private void incrementEventsProgress()
+    {
+        double currentProgress = this.eventsProgressIndicator.getProgress();
+        double nextProgress = currentProgress == 0.9 ? 0.0 : (currentProgress + 0.1);
+
+        this.eventsProgressIndicator.setProgress(nextProgress);
     }
 
     // Just for testing, do not use because there is no need to create a thread everytime, one thred is enough
